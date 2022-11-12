@@ -1,47 +1,25 @@
 package chatserver;
 
 public class Message {
-    private String type;
-    private String content;
-    private String sender;
-    
-    public Message(String type, String content, String sender) {
-        this.type = type;
-        this.content = content;
-        this.sender = sender;
-    }
-    
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
     
     public interface MessageManager {
-        static final String TYPE_REQUEST_USERS = "type_request_users";
-        static final String TYPE_RESPONSE_USERS = "type_response_users";
-        static final String TYPE_MESSAGE = "type_message";
-        static final String TYPE_CHECK_CONNECT = "type_check_connect";
-
         void onMessage(User user, String message);
         void sendMessage(User user, String message);
     }
+}
+class MessageType {
+    static final int REQUEST_USERS = 0;
+    static final int RESPONSE_USERS = 1;
+    static final int SEND_CHAT = 2;
+    static final int RECEIVE_CHAT = 3;
+    static final int START_CHAT = 4;
+    static final int CHECK_CONNECT = 5;
+    static final int REPONSE_ROOM_NUMBER = 6;
+    static final int INVITE_ROOM = 7;
+    static final int REQUEST_ROOMS = 8;
+    static final int REQUEST_INVITE_LIST = 9;
+    static final int RESPONSE_INVITE_LIST = 10;
+    static final int REQUEST_CHAT_LOG = 11;
+
+    static final int REQUEST_GROUP_ROOM = 12;
 }

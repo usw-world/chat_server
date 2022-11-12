@@ -16,4 +16,7 @@ public class UserInformation {
     public String getNameWithAddress(String address) {
         return userInformations.get(address);
     }
+    public String getUserName(User user) {
+        return getNameWithAddress(user.getIP());
+    }
 }

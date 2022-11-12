@@ -10,6 +10,16 @@ import chatserver.Message.MessageManager;
 import java.lang.Thread;
 
 public class User {
+    /* these is for test on one PC >> */
+    String mode = "test";
+    static int ccount = 0;
+    int count;
+    public String getIP() {
+        if(mode == "test")
+            return "127.0.0." + count;
+        return address.getHostString();
+    }
+    /* << these is for test on one PC */
     boolean isConnect = false;
 
     Thread inputThread;
@@ -19,6 +29,10 @@ public class User {
     public MessageManager messageManager;
 
     public User(SocketIO io, MessageManager messageManager) {
+        /* these is for test on one PC >> */
+        count = ++ccount;
+        /* << these is for test on one PC */
+
         User self = this;
         if(!io.socket.isClosed()) {
             isConnect = true;
@@ -43,9 +57,9 @@ public class User {
     }
     public boolean getConnectState() {
         try {
-            Message message = new Message(MessageManager.TYPE_CHECK_CONNECT, null, null);
-            JSONObject json = new JSONObject(message);
-            io.writer.write(json.toString()+"\n");
+            JSONObject json = new JSONObject();
+            json.put("type", MessageType.CHECK_CONNECT);
+            io.writer.write(json.toString() + "\n");
             io.writer.flush();
             return true;
         } catch(IOException ioe) {

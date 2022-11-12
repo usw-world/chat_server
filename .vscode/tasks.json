@@ -16,7 +16,24 @@
 			"problemMatcher": [
 				"$gradle"
 			],
-			"label": "gradle: app:run",
-		}
+			"label": "gradle: app:run"
+		},
+		{
+			"type": "gradle",
+			"id": "d:\\lacture\\java\\chatserverapp:runapp",
+			"script": "app:run",
+			"description": "Runs this project as a JVM application",
+			"project": "app",
+			"buildFile": "D:\\lacture\\java\\chatserver\\app\\build.gradle",
+			"rootProject": "chatserver",
+			"projectFolder": "d:\\lacture\\java\\chatserver",
+			"workspaceFolder": "d:\\lacture\\java\\chatserver",
+			"args": "",
+			"javaDebug": false,
+			"problemMatcher": [
+				"$gradle"
+			],
+			"label": "gradle: app:run"
+		},
 	]
 }
