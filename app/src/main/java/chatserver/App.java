@@ -182,6 +182,7 @@ class ChatServer {
                             sendMessage(MessageType.INVITE_ROOM, user, json);
                         }
                     } else {
+                        originRoom.innerUsers.add(target);
                         json.put("roomNumber", originRoom.roomNumber);
                         sendMessage(MessageType.INVITE_ROOM, target, json);
                     }
@@ -242,8 +243,9 @@ class ChatServer {
     }
     public boolean isPrivateRoom(Room target) {
         for(PrivateRoom room : privateRooms) {
-            if(room.roomNumber == target.roomNumber)
+            if(room.roomNumber == target.roomNumber) {
                 return true;
+            }
         }
         return false;
     }
