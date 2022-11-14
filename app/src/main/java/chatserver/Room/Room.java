@@ -23,14 +23,17 @@ public class Room {
         JSONObject json = new JSONObject();
         ArrayList<String> speakerIpList = new ArrayList<>();
         ArrayList<String> chatList = new ArrayList<>();
+        ArrayList<Boolean> isAlertList = new ArrayList<>();
 
         for(ChatItem item : chatLog) {
             speakerIpList.add(item.author.getIP());
             chatList.add(item.text);
+            isAlertList.add(item.isAlert);
         }
 
         json.put("speakerIpList", speakerIpList);
         json.put("chatList", chatList);
+        json.put("isAlertList", isAlertList);
         return json;
     } 
     public boolean contains(User target) {

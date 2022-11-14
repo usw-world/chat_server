@@ -22,4 +22,6 @@ class MessageType {
     static final int REQUEST_CHAT_LOG = 11;
 
     static final int REQUEST_GROUP_ROOM = 12;
+
+    static final int JOIN_ALERT = 13;
 }

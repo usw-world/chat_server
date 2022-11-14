@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import org.json.*;
 
+import com.google.common.net.MediaType;
+
 import chatserver.Message.MessageManager;
 import chatserver.Room.*;
 
@@ -60,6 +62,7 @@ class ChatServer {
                 }
                 if(alreadyUser != null)
                     users.remove(alreadyUser);
+                    
                 users.add(newUser);
             }
         } catch(IOException ioe) {
@@ -85,10 +88,7 @@ class ChatServer {
                     ArrayList<String> ipList = new ArrayList<>();
                     for(int i=0; i<users.size(); i++) {
                         User user = users.get(i);
-                        if(!user.getConnectState()) {
-                            users.remove(user);
-                            i--;
-                        } else {
+                        if(user.getConnectState()) {
                             String address = user.getIP();
                             String name = userMap.getNameWithAddress(address);
                             if(!address.equals(sender.getIP())) {
@@ -146,9 +146,8 @@ class ChatServer {
                             json.put("roomNumber", roomNumber);
                             json.put("myOwn", myOwn);
                             User t = getUserWithAddress(user.getIP());
-                            System.out.println(userMap.getNameWithAddress(t.getIP()));
-                            sendMessage(MessageType.RECEIVE_CHAT, t, json);
-                            System.out.println("continue");
+                            if(t != null)
+                                sendMessage(MessageType.RECEIVE_CHAT, t, json);
                         }
                     }
                 } break;
@@ -191,10 +190,18 @@ class ChatServer {
                             User u = getUserWithAddress(user.getIP());
                             sendMessage(MessageType.INVITE_ROOM, u, json);
                         }
+                        originRoom = newRoom;
                     } else {
                         originRoom.innerUsers.add(target);
                         json.put("roomNumber", originRoom.roomNumber);
                         sendMessage(MessageType.INVITE_ROOM, target, json);
+                    }
+                    originRoom.chatLog.add(new ChatItem(target, true));
+                    JSONObject joinJson = new JSONObject();
+                    joinJson.put("roomNumber", originRoom.roomNumber);
+                    joinJson.put("userName", getUserName(target));
+                    for(User u : originRoom.innerUsers) {
+                        sendMessage(MessageType.JOIN_ALERT, u, joinJson);
                     }
                 } break;
                 case MessageType.REQUEST_CHAT_LOG: {
@@ -208,7 +215,6 @@ class ChatServer {
                     for(int i=0; i<ips.length(); i++) {
                         speakerList.add(userMap.getNameWithAddress(ips.getString(i)));
                     }
-                    
                     json.put("speakerList", speakerList);
                     json.put("receiver", userMap.getNameWithAddress(sender.getIP()));
                     json.put("roomNumber", roomNumber);
@@ -222,7 +228,7 @@ class ChatServer {
                             JSONObject r = new JSONObject();
                             r.put("roomNumber", room.roomNumber);
                             JSONArray userArray = new JSONArray();
-                            for(User user : room.innerUsers) {
+                            for(User user : room.innerUsers) {  
                                 userArray.put(userMap.getNameWithAddress(user.getIP()));
                             }
                             r.put("userList", userArray);
@@ -282,6 +288,7 @@ class ChatServer {
             user.messageManager.sendMessage(user, json.toString());
             return true;
         } else {
+            System.out.println("fail to send message.");
             return false;
         }
     }

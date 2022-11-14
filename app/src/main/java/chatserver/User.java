@@ -11,8 +11,8 @@ import java.lang.Thread;
 
 public class User {
     /* these is for test on one PC >> */
-    // String mode = "product";
-    String mode = "test";
+    String mode = "product";
+    // String mode = "test";
     static int ccount = 0;
     int count;
     public String getIP() {
@@ -32,7 +32,7 @@ public class User {
     public User(SocketIO io, MessageManager messageManager) {
         /* these is for test on one PC >> */
         count = ++ccount;
-        if(ccount >= 3) ccount = 0;
+        if(ccount >= 4) ccount = 0;
         /* << these is for test on one PC */
 
         User self = this;
@@ -41,13 +41,13 @@ public class User {
         }
         this.io = io;
         this.messageManager = messageManager;
+        address = (InetSocketAddress)io.socket.getRemoteSocketAddress();
         inputThread = new Thread() {
             @Override
             public void run() {
                 try {
                     while(isConnect) {
                         String message = io.reader.readLine();
-                        address = (InetSocketAddress)io.socket.getRemoteSocketAddress();
                         messageManager.onMessage(self, message);
                     }
                 } catch(Exception e) {
