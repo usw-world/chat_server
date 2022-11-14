@@ -23,7 +23,7 @@ class ChatServer {
     final int PORT_NUMBER = 9910;
     Socket socket;
 
-    static ArrayList<User> users = new ArrayList<>();
+    static public ArrayList<User> users = new ArrayList<>();
     public UserInformation userMap;
 
     static ArrayList<PrivateRoom> privateRooms = new ArrayList<>();
@@ -51,7 +51,16 @@ class ChatServer {
                         }
                     };
                 };
-                users.add(new User(io, ms));
+                User newUser = new User(io, ms);
+                User alreadyUser = null;
+                for(int i=0; i<users.size(); i++) {
+                    if(users.get(i).getIP().equals(newUser.getIP())) {
+                        alreadyUser = users.get(i);
+                    }
+                }
+                if(alreadyUser != null)
+                    users.remove(alreadyUser);
+                users.add(newUser);
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
@@ -136,7 +145,10 @@ class ChatServer {
                             json.put("speakerIp", sender.getIP());
                             json.put("roomNumber", roomNumber);
                             json.put("myOwn", myOwn);
-                            sendMessage(MessageType.RECEIVE_CHAT, user, json);
+                            User t = getUserWithAddress(user.getIP());
+                            System.out.println(userMap.getNameWithAddress(t.getIP()));
+                            sendMessage(MessageType.RECEIVE_CHAT, t, json);
+                            System.out.println("continue");
                         }
                     }
                 } break;
@@ -147,14 +159,11 @@ class ChatServer {
                     Room room = getRoom(request.getInt("roomNumber"));
                     for(int i=0; i<users.size(); i++) {
                         User user = users.get(i);
-                        if(!user.getConnectState()) {
-                            users.remove(user);
-                            i--;
-                        } else {
+                        if(user.getConnectState()) {
                             String address = user.getIP();
                             String name = userMap.getNameWithAddress(address);
                             if(!address.equals(sender.getIP())
-                            && !room.innerUsers.contains(user)) {
+                            && !room.contains(user)) {
                                 userList.add(name);
                                 ipList.add(address);
                             }
@@ -170,16 +179,17 @@ class ChatServer {
                     Room originRoom = getRoom(request.getInt("roomNumber"));
                     JSONObject json = new JSONObject();
                     if(isPrivateRoom(originRoom)) {
-                        PrivateRoom pr = (PrivateRoom) originRoom;
                         ArrayList<User> userList = new ArrayList<>();
                         userList.add(target);
-                        userList.add(pr.eachUser[0]);
-                        userList.add(pr.eachUser[1]);
+                        for(User u : originRoom.innerUsers) {
+                            userList.add(u);
+                        }
                         GroupRoom newRoom = new GroupRoom(userList);
                         groupRooms.add(newRoom);
                         json.put("roomNumber", newRoom.roomNumber);
                         for(User user : userList) {
-                            sendMessage(MessageType.INVITE_ROOM, user, json);
+                            User u = getUserWithAddress(user.getIP());
+                            sendMessage(MessageType.INVITE_ROOM, u, json);
                         }
                     } else {
                         originRoom.innerUsers.add(target);
@@ -208,12 +218,11 @@ class ChatServer {
                     JSONObject json = new JSONObject();
                     JSONArray rooms = new JSONArray();
                     for(GroupRoom room : groupRooms) {
-                        if(room.innerUsers.contains(sender)) {
+                        if(room.contains(sender)) {
                             JSONObject r = new JSONObject();
                             r.put("roomNumber", room.roomNumber);
                             JSONArray userArray = new JSONArray();
                             for(User user : room.innerUsers) {
-                                // r.put("userIpList", user.getIP());
                                 userArray.put(userMap.getNameWithAddress(user.getIP()));
                             }
                             r.put("userList", userArray);
@@ -276,16 +285,16 @@ class ChatServer {
             return false;
         }
     }
-    public int sendMessageAll(String type, JSONObject json) {
-        json.put("type", type);
-        int count = 0;
-        for(int i=0; i<users.size(); i++) {
-            User user = users.get(i);
-            if(user.getConnectState()) {
-                user.messageManager.sendMessage(user, json.toString());
-                count ++;
-            }
-        }
-        return count;
-    }
+    // public int sendMessageAll(String type, JSONObject json) {
+    //     json.put("type", type);
+    //     int count = 0;
+    //     for(int i=0; i<users.size(); i++) {
+    //         User user = users.get(i);
+    //         if(user.getConnectState()) {
+    //             user.messageManager.sendMessage(user, json.toString());
+    //             count ++;
+    //         }
+    //     }
+    //     return count;
+    // }
 }

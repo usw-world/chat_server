@@ -33,4 +33,11 @@ public class Room {
         json.put("chatList", chatList);
         return json;
     } 
+    public boolean contains(User target) {
+        for(User user : innerUsers) {
+            if(user.getIP().equals(target.getIP()))
+                return true;
+        }
+        return false;
+    }
 }

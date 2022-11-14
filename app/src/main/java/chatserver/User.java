@@ -11,6 +11,7 @@ import java.lang.Thread;
 
 public class User {
     /* these is for test on one PC >> */
+    // String mode = "product";
     String mode = "test";
     static int ccount = 0;
     int count;
@@ -31,6 +32,7 @@ public class User {
     public User(SocketIO io, MessageManager messageManager) {
         /* these is for test on one PC >> */
         count = ++ccount;
+        if(ccount >= 3) ccount = 0;
         /* << these is for test on one PC */
 
         User self = this;
@@ -63,7 +65,11 @@ public class User {
             io.writer.flush();
             return true;
         } catch(IOException ioe) {
+            System.out.println("IOException in 'boolean getConnectState()'");
             ioe.printStackTrace();
+            return false;
+        } catch(Exception e) {
+            System.out.println("Exception in 'boolean getConnectState()'");
             return false;
         }
     }
